@@ -1,7 +1,9 @@
+import java.util.Random;
+
 public class RubikCube
 {
     private int[][][] cube; //values 0-53 (stores initial position)
-    private int[] temp; // to store a row or column temporarily -- !!NEEDS CHANGE TO BE USED AS LOCAL MEMORY!!  
+    //private int[] temp; // to store a row or column temporarily -- !!NEEDS CHANGE TO BE USED AS LOCAL MEMORY!!  
 
 
 
@@ -20,8 +22,9 @@ public class RubikCube
 
     /*CONSTRUCTOR */
 
-    RubikCube() //creates the initial rubikCube--Random State
+    RubikCube(int randmoves) //creates the initial rubikCube--Random State
     {
+        cube=new int[6][3][3];
         int value=0;
         for(int s=0; s<6; s++)
         {
@@ -35,7 +38,7 @@ public class RubikCube
             }
         } //creates the cube
 
-        randomizeCube(); //after that it randomises it 
+        randomizeCube(randmoves); //after that it randomises it 
     }
 
 
@@ -50,7 +53,7 @@ public class RubikCube
 
 
 
-    /*MOVES*/
+    /*MOVES --WE USE 4 MOVES-- */ 
 
     public void moveU()//moves upper side clockwise(to the left)
     /*front upper row  = right upper row 
@@ -60,7 +63,7 @@ public class RubikCube
     * top face is twisted clockwise
     */
     {
-       int [] row_temp = getRow(0,0);
+       int [] row_temp = getRow(0,0); //holds the first front row 
 
        for(int col=0; col<3; col++)
        {
@@ -84,14 +87,16 @@ public class RubikCube
      *left face is twisted clockwise
      */
     {
-        int [] col_temp = getColumn(0, 0); 
+        int [] colf2 = getColumn(2, 0);
+        int [] colf5 = getColumn(5, 0); 
+        int [] colf0 = getColumn(0, 0);
 
         for(int row=0; row<3; row++)
         {
             cube[0][row][0] = cube[4][row][0];
-            cube[4][row][0] = cube[2][3-row][0];
-            cube[2][row][0] = cube[5][3-row][0];
-            cube[5][row][0] = col_temp[row];
+            cube[4][row][0] = colf2[2-row];
+            cube[2][row][0] = colf5[2-row];
+            cube[5][row][0] = colf0[row];
         }
 
         twist_face_clockwise(1);
@@ -105,14 +110,16 @@ public class RubikCube
      *right face twist clockwise
      */
     {
-        int [] col_temp = getColumn(0, 2); 
+        int [] colf0 = getColumn(0, 2); 
+        int [] colf2 = getColumn(2, 2);
+        int [] colf4 = getColumn(4, 2);
 
         for(int row=0; row<3; row++)
         {
             cube[0][row][2] = cube[5][row][2];
-            cube[5][row][2] = cube[2][3-row][2];
-            cube[2][row][2] = cube[4][3-row][2];
-            cube[4][row][2] = col_temp[row];
+            cube[5][row][2] = colf2[2-row];
+            cube[2][row][2] = colf4[2-row];
+            cube[4][row][2] = colf0[row];
         }
 
         twist_face_clockwise(1);
@@ -132,8 +139,8 @@ public class RubikCube
         {
             cube[0][2][col]=cube[1][2][col];
             cube[1][2][col]=cube[2][2][col]; 
-            cube[2][2][col]=cube[4][2][col];
-            cube[4][2][col]=row_temp[col];
+            cube[2][2][col]=cube[3][2][col];
+            cube[3][2][col]=row_temp[col];
 
         } //twists bottom  row clockwise
 
@@ -141,33 +148,35 @@ public class RubikCube
     }
 
 
+
+
     /*FUNCTIONS USED FOR MOVES */
     public int[] getRow(int facevalue,int row)
     {
+        int[] temp = new int[3];
         for(int c=0; c<3; c++){temp[c]=cube[facevalue][row][c];}
         return temp;
     }
 
     public int[] getColumn(int facevalue, int col)
     {
+        int[] temp = new int[3];
         for(int r=0; r<3; r++){temp[r]=cube[facevalue][r][col];}
         return temp;
     }
 
     public void twist_face_clockwise(int facevalue)
     {
-        int [] col2 = getColumn(4, 2);
-        int [] row0 = getRow(4,0);
-        for(int i=0; i<3; i++)
-        {
-            cube[facevalue][0][i] = cube[facevalue][3-i][0]; //row0 = col0
-            cube[facevalue][i][0] = cube[facevalue][i][2]; // col0 = row2 
-            cube[facevalue][i][2] = row0[i]; //col2=row0
-            cube[facevalue][2][i] = col2[3-i];//row2=col2
-        }
+       int[] col0 = getColumn(facevalue, 0);
+       int[] col1 = getColumn(facevalue, 1);
+       int[] col2 = getColumn(facevalue, 2);
+       for(int i=0; i<3; i++)
+       {
+        cube[facevalue][0][i] = col0[2-i];
+        cube[facevalue][1][i] = col1[2-i];
+        cube[facevalue][2][i] = col2[2-i];
+       }
     }
-
-
     /*OTHER FUNCTIONS */
 
     public void printCube() //prints the state of the cube
@@ -179,10 +188,95 @@ public class RubikCube
                    BOTTOM FACE
 
         */
+
+        System.out.println("------------");
+        int swap_face=0;
+        for(int s=0; s<6; s++)
+        {
+            for(int r=0; r<3; r++)
+            {
+                for(int c=0; c<3; c++)
+                {
+                    if(cube[s][r][c]<9)
+                    {
+                        System.out.print("r ");
+                    }
+                    else if(cube[s][r][c]<18)
+                    {
+                        System.out.print("g ");
+                    }
+                    else if(cube[s][r][c]<27)
+                    {
+                        System.out.print("o ");
+                    }
+                    else if(cube[s][r][c]<36)
+                    {
+                        System.out.print("b ");
+                    }
+                    else if(cube[s][r][c]<45)
+                    {
+                        System.out.print("w ");
+                    }
+                    else if(cube[s][r][c]<54)
+                    {
+                        System.out.print("y ");
+                    }
+                    // System.out.print(" "+cube[s][r][c]+" ");
+                    if(c==2)
+                    {
+                        System.out.print("\n");
+                        swap_face++;
+                    }
+                    if(swap_face==3)
+                    {
+                        System.out.print("\n \n");
+                        swap_face=0;
+                    }
+                }
+            }
+        }
+        System.out.println("------------");
     }
 
-    public void randomizeCube() //uses a set amount of random moves to scramble the cube 
+    public void printTemp() //to test if the cubies are moving correctly
     {
+        System.out.println("------------");
+        int swap_face=0;
+        for(int s=0; s<6; s++)
+        {
+            for(int r=0; r<3; r++)
+            {
+                for(int c=0; c<3; c++)
+                {
+                    System.out.print(" "+cube[s][r][c]+" ");
+                    if(c==2)
+                    {
+                        System.out.print("\n");
+                        swap_face++;
+                    }
+                    if(swap_face==3)
+                    {
+                        System.out.print("\n \n");
+                        swap_face=0;
+                    }
+                }
+            }
+        }
+    }
+
+    public void randomizeCube(int randmoves) //uses a set amount of random moves to scramble the cube 
+    {
+        Random r  = new Random();
+        int upper = 4;
+        int move;
+        for(int i=0; i<randmoves; i++)
+        {
+            move = r.nextInt(upper); //chooses which move we are gonna use to shuffle 
+            if(move==0){moveU();}
+            else if(move==1){moveD();}
+            else if(move==2){moveL();}
+            else if(move==3){moveR();}
+        }
 
     }
 
