@@ -24,6 +24,7 @@ public class SpaceSearcher
             Collections.sort(this.frontier);
         }
         return null;
+        //this is the class for the A*
     }
 
 }
