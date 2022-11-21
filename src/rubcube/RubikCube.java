@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
-public class RubikCube
+public class RubikCube implements Comparable<RubikCube>
 {
     private int[][][] cube; //values 0-53 (stores initial position)
 
@@ -20,6 +20,8 @@ public class RubikCube
     private int sides_needed; //sides needed to be solved
     private double score; //the heuristic score
     private RubikCube father; // the father state
+
+    protected PositionHolder ph = new PositionHolder(); // used in our heuristic function
 
     /*CONSTRUCTOR */
 
@@ -40,7 +42,7 @@ public class RubikCube
             }
         } //creates the cube
 
-        randomizeCube(randmoves); //after that it randomises it 
+        randomizeCube(randmoves); //after that it randomises it
     }
 
     RubikCube(int[][][] cube) //copy constructor 
@@ -445,7 +447,55 @@ public class RubikCube
     
     public boolean checkForFinal(int sides_needed)
     {
-             return true; //will change 
+        boolean flag = true;   //to check if we have a wrong cubie in a face so we can skip its whole iteration
+                                //and to help us check how many sides are complete
+        int check = 0;
+        for(int s=0; s<6; s++)
+        {
+
+            int prev = -1;    //initialize every time we enter a new face, stores the previous from the current value of the cube
+            int curr = -1;
+
+            for(int r=0; r<3; r++)
+            {
+                if (flag)       //if true check face
+                {
+                    for(int c=0; c<3; c++)
+                    {
+                        curr = cube[s][r][c];
+                        if (c == 0)
+                        {
+                            prev = cube[s][r][c];
+                            continue;
+                        }
+                        else
+                        {
+                            if ( (curr != prev+1) && (helping_conditions(prev, curr) == false) )
+                            {
+                                flag = false;
+                                break;
+                            }
+                            prev = curr;
+                        }
+                    }
+                }
+                else break;
+            }
+
+            if (flag) check++;          //checks if the side is complete
+            else flag = true;
+
+        }
+
+        if (check < sides_needed) return false;        //if it is larger than the sides needed is correct
+
+        return true;
+    }
+
+    private boolean helping_conditions(int prev, int curr)
+    {
+        return ( (prev == 8 && curr == 9) || (prev == 17 && curr == 18) || (prev == 26 && curr == 27) ||
+                (prev == 35 && curr == 36) || (prev == 44 && curr == 45));
     }
      
     public ArrayList<RubikCube> getCubeChildren(int heuristic)
@@ -515,14 +565,54 @@ public class RubikCube
         return children;
     }
 
-    private void evaluate(int heuristic)
+    public int compareTo(RubikCube rc)          //temporary, to find where it is used
     {
-        if(heuristic==1){this.count3dManhattanDistance();}
+        return Double.compare(this.score, rc.score);
     }
 
-    private void count3dManhattanDistance()
-    {
 
+    private void evaluate(int heuristic)
+    {
+        if(heuristic==1){this.heuristic1();}
+    }
+
+    private void heuristic1()
+        /*
+       Uses the 3d Manhattan Distance function for the cubies
+       For each cubie, compute the
+       minimum number of moves required to correctly position and orient
+       it, and sum these values over all cubies.Unfortunately, to be
+       admissible, this value has to be divided by 8, since every twist
+       moves 8 cubies
+         */
+    {
+        this.score = count3dManhattanDistance()/8;
+    }
+
+    private double count3dManhattanDistance()
+    {
+        int corrZ;
+        int corrX;
+        int corrY;
+        int val;
+
+        for (int z=0; z<6; z++)
+        {
+            for (int x=0; x<3; x++)
+            {
+                for (int y=0; y<3; y++)
+                {
+                    val = cube[z][x][y];
+                    corrZ = ph.getInitCoordsZ(val);
+                    corrX = ph.getInitCoordsX(val);
+                    corrY = ph.getInitCoordsY(val);
+
+                    this.score += (Math.abs(corrZ - z) + Math.abs(corrX - x) + Math.abs(corrY - y));
+                }
+            }
+        }
+
+        return this.score;
     }
 
 }

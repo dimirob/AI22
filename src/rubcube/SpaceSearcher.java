@@ -5,7 +5,8 @@ import java.util.Collections;
 
 public class SpaceSearcher
 {
-    private ArrayList<RubikCube> frontier; //the frontier to be searched by the algorithm 
+    private ArrayList<RubikCube> frontier; //the frontier to be searched by the algorithm
+    private int sides_needed;
     SpaceSearcher()
     {
         this.frontier = new ArrayList<>();
