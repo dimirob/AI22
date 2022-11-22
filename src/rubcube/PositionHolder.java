@@ -1,7 +1,8 @@
 package rubcube;
 
-class PositionHolder
-{ //holds the initial position of the blocks
+public class PositionHolder
+{ 
+    //holds the initial position of the blocks
     private int[] coordsX,coordsY,coordsZ;
 
     PositionHolder() 

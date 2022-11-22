@@ -1,10 +1,11 @@
 package rubcube;
+
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
-public class RubikCube
+public class RubikCube implements Comparable<RubikCube>
 {
     private int[][][] cube; //values 0-53 (stores initial position)
 
@@ -17,16 +18,14 @@ public class RubikCube
     */
      
 
-    private int sides_needed; //sides needed to be solved
-    private double score; //the heuristic score
-    private RubikCube father; // the father state
+    private double score; //the heuristic score for A*
+    private RubikCube father = null; // the father state
 
     /*CONSTRUCTOR */
 
-    RubikCube(int randmoves, int sides_needed) //creates the initial rubikCube--Random State
+    RubikCube(int randmoves) //creates the initial rubikCube--Random State
     {
         cube=new int[6][3][3];
-        this.sides_needed=sides_needed;
         int value=0;
         for(int s=0; s<6; s++)
         {
@@ -347,6 +346,13 @@ public class RubikCube
         int swap_face=0;
         for(int s=0; s<6; s++)
         {
+            if(s==0){System.out.println("front");}
+            else if(s==1){System.out.println("left");}
+            else if(s==2){System.out.println("back");}
+            else if(s==3){System.out.println("right");}
+            else if(s==4){System.out.println("top");}
+            else if(s==5){System.out.println("bottom");}
+
             for(int r=0; r<3; r++)
             {
                 for(int c=0; c<3; c++)
@@ -443,86 +449,125 @@ public class RubikCube
     
     /* --FOR ALGORITHM-- */
     
-    public boolean checkForFinal(int sides_needed)
+    public boolean checkForFinal(int sides_needed, PositionHolder init_pos) 
     {
-             return true; //will change 
+        int sides_solved = 0;
+        int init_z , init_x , init_y;
+        for (int z=0; z<6; z++)
+        {
+            for(int x=0; x<3; x++)
+            {
+                for(int y=0; y<3; y++)
+                {    
+                    init_z = init_pos.getInitCoordsZ(cube[z][x][y]);
+                    init_x = init_pos.getInitCoordsX(cube[z][x][y]);
+                    init_y = init_pos.getInitCoordsY(cube[z][x][y]);
+                    if(cube[z][x][y]!=cube[init_z][init_x][init_y]){return false;}
+                }
+            }
+            sides_solved++;
+            if(sides_solved==sides_needed){return true;}
+        } 
+        return true;
     }
      
-    public ArrayList<RubikCube> getCubeChildren(int heuristic)
+    public ArrayList<RubikCube> getCubeChildren(int heuristic, PositionHolder init_pos)
     {
         ArrayList<RubikCube> children = new ArrayList<>();
         RubikCube child = new RubikCube(this.cube);
 
         child.moveU();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveUcc();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveD();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveDcc();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveL();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveLcc();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveR();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveRcc();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveF();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         child = new RubikCube(this.cube);
         child.moveFcc();
-        if(heuristic>0) child.evaluate(heuristic);
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
 
         return children;
     }
 
-    private void evaluate(int heuristic)
+    private void evaluate(int heuristic, PositionHolder init_pos)
     {
-        if(heuristic==1){this.count3dManhattanDistance();}
+        if(heuristic==1){this.count3dManhattanDistance(init_pos);}
     }
 
-    private void count3dManhattanDistance()
+    private void count3dManhattanDistance(PositionHolder init_pos) //this is the heuristic function for the solution of the cube 
     {
+        int temp = 0;
+        int init_x , init_y , init_z ;
 
+        for(int z = 0; z<6; z++)
+        {
+            for(int x = 0; x<3; x++)
+            {
+                for(int y = 0; y<3; y++)
+                {
+                    init_z = init_pos.getInitCoordsZ(cube[z][x][y]);
+                    init_x = init_pos.getInitCoordsX(cube[z][x][y]);
+                    init_y = init_pos.getInitCoordsY(cube[z][x][y]);
+                    temp += Math.abs(z-init_z) + Math.abs(x - init_x) + Math.abs(y - init_y);
+                }
+            }
+        }
+        this.score = temp / 8.0 + this.father.getScore();
+    }
+
+    @Override
+    public int compareTo(RubikCube r) 
+    {
+        return Double.compare(this.score, r.getScore());
     }
 
 }
