@@ -19,6 +19,7 @@ public class RubikCube implements Comparable<RubikCube>
 
     private int sides_needed; //sides needed to be solved
     private double score; //the heuristic score
+    private double real_cost;
     private RubikCube father; // the father state
 
     protected PositionHolder ph = new PositionHolder(); // used in our heuristic function
@@ -576,6 +577,11 @@ public class RubikCube implements Comparable<RubikCube>
         if(heuristic==1){this.heuristic1();}
     }
 
+    private void findRealCost()         //finds the real cost of the move
+    {
+        this.real_cost = count3dManhattanDistance(0.0);
+    }
+
     private void heuristic1()
         /*
        Uses the 3d Manhattan Distance function for the cubies
@@ -586,15 +592,44 @@ public class RubikCube implements Comparable<RubikCube>
        moves 8 cubies
          */
     {
-        this.score = count3dManhattanDistance()/8;
+        this.score = count3dManhattanDistance(this.score)/8;
     }
 
-    private double count3dManhattanDistance()
+    private void heiristic2()
+    {
+        int[] corner_cubies = new int[6];
+        int[] edge_cubies = new int[6];
+
+        int corrZ;
+        int corrX;
+        int corrY;
+        int val;
+
+        for (int z=0; z<6; z++)
+        {
+
+        }
+    }
+
+    private int getMax(int[] arr)   //returns the maximum value of the given array
+    {
+        int max = arr[0];
+
+        for (int i=1; i<arr.length; i++)
+        {
+            if (arr[i] > max) max = arr[i];
+        }
+
+        return max;
+    }
+
+    private double count3dManhattanDistance(double s)
     {
         int corrZ;
         int corrX;
         int corrY;
         int val;
+        double sum = s;
 
         for (int z=0; z<6; z++)
         {
@@ -607,12 +642,12 @@ public class RubikCube implements Comparable<RubikCube>
                     corrX = ph.getInitCoordsX(val);
                     corrY = ph.getInitCoordsY(val);
 
-                    this.score += (Math.abs(corrZ - z) + Math.abs(corrX - x) + Math.abs(corrY - y));
+                    sum += (Math.abs(corrZ - z) + Math.abs(corrX - x) + Math.abs(corrY - y));
                 }
             }
         }
 
-        return this.score;
+        return sum;
     }
 
 }
