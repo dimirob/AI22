@@ -20,13 +20,13 @@ public class SpaceSearcher
     {
         PositionHolder init_pos = new PositionHolder();
 
-        if(initial_cube.checkForFinal(sides_needed,init_pos)) return initial_cube;
+        if(initial_cube.checkForFinal(sides_needed)) return initial_cube;
         this.frontier.add(initial_cube);
 
         while(this.frontier.size() > 0)
         {
             RubikCube currentCube = this.frontier.remove(0);
-            if(currentCube.checkForFinal(sides_needed,init_pos)) return currentCube;
+            if(currentCube.checkForFinal(sides_needed)) return currentCube;
             this.frontier.addAll(currentCube.getCubeChildren(heuristic,init_pos));
             Collections.sort(this.frontier);
         }

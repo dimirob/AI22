@@ -10,8 +10,10 @@ public class PositionHolder
      * we need to coordsZ[0] coordsX[0] coordsY[0] 
      * --->this will be used in the heuristic function for the evaluation of the state
      */
-    
     {
+        coordsZ = new int[54]; 
+        coordsX = new int[54];
+        coordsY = new int[54];
         int value =0;
         for(int z=0; z<6; z++)
         {
