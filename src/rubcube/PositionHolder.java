@@ -2,7 +2,9 @@ package rubcube;
 
 class PositionHolder
 { //holds the initial position of the blocks
-    private int[] coordsX,coordsY,coordsZ;
+    private int[] coordsX = new int[54];
+    private int[] coordsZ = new int[54];
+    private int[] coordsY = new int[54];
 
     PositionHolder() 
     /*default initialization --> for example to get the inital coordinates of the red square which i have numbered as 0
@@ -18,9 +20,9 @@ class PositionHolder
             {
                 for(int y=0; y<3; y++)
                 {
-                    coordsZ[value]=z;
-                    coordsX[value]=x;
-                    coordsY[value]=y;
+                    this.coordsZ[value]=z;
+                    this.coordsX[value]=x;
+                    this.coordsY[value]=y;
                     value++;
                 }
             }
