@@ -275,8 +275,6 @@ public class RubikCube implements Comparable<RubikCube>
     {
         int[] colf3 = getColumn(3, 0);
         int[] colf1 = getColumn(1, 2);
-        //int[] rowf4 = getRow(4, 2);
-        //int[] rowf5 = getRow(5, 1);
 
         for (int i=0; i<3; i++)
         {
@@ -287,6 +285,167 @@ public class RubikCube implements Comparable<RubikCube>
         }
 
         twist_face_counterclockwise(0);
+    }
+
+    public void moveB() //twists back face clockwise
+    /* top first row = right right col
+     * left left col = top first row (reversed)
+     * bottom down row = left left col (reversed)
+     * right right col = bottom down row
+     *  back face twist clockwise
+     */
+    {
+        int[] colf3 = getColumn(3, 2);
+        int[] colf1 = getColumn(1, 0);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[1][i][0] = cube[4][0][2-i];
+            cube[4][0][i] = colf3[i];
+            cube[3][i][2] = cube[5][2][i];
+            cube[5][2][i] = colf1[2-i];
+        }
+
+        twist_face_clockwise(2);
+    }
+
+    public void moveBcc() //twists back face counterclockwise
+        /* top first row = left left col (reversed)
+         * right right col = top first row
+         * bottom down row = right right col (reversed)
+         * left left col = bottom down row
+         * back face twist counterclockwise
+         */
+    {
+        int[] colf3 = getColumn(3, 2);
+        int[] colf1 = getColumn(1, 0);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[3][i][2] = cube[4][0][i];
+            cube[4][0][i] = colf1[2-i];
+            cube[1][i][0] = cube[5][2][i];
+            cube[5][2][i] = colf3[2-i];
+        }
+
+        twist_face_counterclockwise(2);
+    }
+
+    /*SLICE MOVES*/
+
+    public void moveM() // turns downwards the middle col of the front face
+    /* front middle col = top middle col
+     * bottom middle col = front middle col
+     * back middle col = bottom middle col (reversed)
+     * top middle col = back middle col (reversed)
+     */
+    {
+        int[] colf5 = getColumn(5, 1);
+        int[] colf2 = getColumn(2, 1);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[5][i][1] = cube[0][i][1];
+            cube[0][i][1] = cube[4][i][1];
+            cube[4][i][1] = colf2[2-i];
+            cube[2][i][1] = colf5[2-i];
+        }
+    }
+
+    public void moveMcc() // turns upwards the middle col of the front face
+        /* front middle col = bottom middle col
+         * top middle col = front middle col
+         * back middle col = top middle col (reversed)
+         * bottom middle col = back middle col (reversed)
+         */
+    {
+        int[] colf5 = getColumn(5, 1);
+        int[] colf2 = getColumn(2, 1);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[4][i][1] = cube[0][i][1];
+            cube[0][i][1] = colf5[i];
+            cube[5][i][1] = colf2[2-i];
+            cube[2][i][1] = cube[4][2-i][1];
+        }
+    }
+
+
+    public void moveE() // turns clockwise the middle row of the first face
+    /* front middle row = left middle row
+     * right middle row = front middle row
+     * back middle row = right middle row
+     * left middle row = back middle row
+     */
+    {
+        int[] rowf3 = getRow(3, 1);
+        int[] rowf1 = getRow(1, 1);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[3][1][i] = cube[0][1][i];
+            cube[0][1][i] = rowf1[i];
+            cube[1][1][i] = cube[2][1][i];
+            cube[2][1][i] = rowf3[i];
+        }
+    }
+
+    public void moveEcc() // turns counterclockwise the middle row of the first face
+    /* front middle row = right middle row
+     * left middle row = front middle row
+     * back middle row = left middle row
+     * right middle row = back middle row
+     */
+    {
+        int[] rowf3 = getRow(3, 1);
+        int[] rowf1 = getRow(1, 1);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[3][1][i] = cube[2][1][i];
+            cube[2][1][i] = rowf1[i];
+            cube[1][1][i] = cube[0][1][i];
+            cube[0][1][i] = rowf3[i];
+        }
+    }
+
+    public void moveS()     //turns clockwise the middle row of the top face
+    /* top middle row = left middle col (reversed)
+     * right middle col = top middle row
+     * bottom middle row = right middle col (reversed)
+     * left middle col = bottom middle row
+     */
+    {
+        int[] colf1 = getColumn(1, 1);
+        int[] colf3 = getColumn(3, 1);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[3][i][1] = cube[4][1][i];
+            cube[4][1][i] = colf1[2-i];
+            cube[1][i][1] = cube[5][1][i];
+            cube[5][1][i] = colf3[2-i];
+        }
+    }
+
+    public void moveScc()     //turns counterclockwise the middle row of the top face
+        /* top middle row = right middle col
+         * left middle col = top middle row (reversed)
+         * bottom middle row = left middle col
+         * right middle col = bottom middle row (reversed)
+         */
+    {
+        int[] rowf4 = getRow(4, 1);
+        int[] rowf5 = getColumn(5, 1);
+
+        for (int i=0; i<3; i++)
+        {
+            cube[4][1][i] = cube[3][i][1];
+            cube[3][i][1] = rowf5[2-i];
+            cube[5][1][i] = cube[1][i][1];
+            cube[1][i][1] = rowf4[2-i];
+        }
     }
 
 
@@ -424,21 +583,29 @@ public class RubikCube implements Comparable<RubikCube>
     public void randomizeCube(int randmoves) //uses a set amount of random moves to scramble the cube 
     {
         Random r  = new Random();
-        int upper = 10;
+        int upper = 18;
         int move;
         for(int i=0; i<randmoves; i++)
         {
             move = r.nextInt(upper); //chooses which move we are gonna use to shuffle 
-            if(move==0){moveU();}
-            else if(move==1){moveUcc();}
-            else if(move==2){moveD();}
-            else if(move==3){moveDcc();}
-            else if(move==4){moveL();}
-            else if(move==5){moveLcc();}
-            else if(move==6){moveR();}
-            else if(move==7){moveRcc();}
-            else if(move==8){moveF();}
-            else if(move==9){moveFcc();}
+            if(move==0) moveU();
+            else if(move==1) moveUcc();
+            else if(move==2) moveD();
+            else if(move==3) moveDcc();
+            else if(move==4) moveL();
+            else if(move==5) moveLcc();
+            else if(move==6) moveR();
+            else if(move==7) moveRcc();
+            else if(move==8) moveF();
+            else if(move==9) moveFcc();
+            else if (move==10) moveB();
+            else if (move==11) moveBcc();
+            else if (move==12) moveM();
+            else if (move==13) moveMcc();
+            else if (move==14) moveE();
+            else if (move==15) moveEcc();
+            else if (move==16) moveS();
+            else if (move==17) moveScc();
         }
 
     }
@@ -464,7 +631,7 @@ public class RubikCube implements Comparable<RubikCube>
                     for(int c=0; c<3; c++)
                     {
                         curr = cube[s][r][c];
-                        if (c == 0)
+                        if (r == 0)
                         {
                             prev = cube[s][r][c];
                             continue;
@@ -559,6 +726,54 @@ public class RubikCube implements Comparable<RubikCube>
 
         child = new RubikCube(this.cube);
         child.moveFcc();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveB();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveBcc();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveM();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveMcc();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveE();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveEcc();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveS();
+        if(heuristic>0) child.evaluate(heuristic);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveScc();
         if(heuristic>0) child.evaluate(heuristic);
         child.setFather(this);
         children.add(child);

@@ -14,6 +14,8 @@ public class SpaceSearcher
 
     RubikCube A_Star(RubikCube initial_cube, int heuristic)
     {
+        PositionHolder ph = new PositionHolder(); // used in our heuristic function
+
         if(initial_cube.checkForFinal(sides_needed)) return initial_cube;
         this.frontier.add(initial_cube);
 
