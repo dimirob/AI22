@@ -1,5 +1,7 @@
 package rubcube;
 
+
+
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,7 +91,11 @@ public class RubikCube implements Comparable<RubikCube>
      * right upper row = front upper row
      * back upper row = right upper row
      * left upper row = back upper row
+
      * top face is twisted  counter clockwise --
+=======
+     * top face is twisted clockwise
+
      */
     {
         int[] temp = getRow(0, 0);  //holds the first front row
@@ -107,8 +113,10 @@ public class RubikCube implements Comparable<RubikCube>
 
     public void moveL()//moves left column clockwise(downwards)
     /*front left col = top left col
+
      *top left col = back right col reversed ---
      *back right col = bottom left col reversed ---
+
      *bottom left col = front left col 
      *left face is twisted clockwise
      */
@@ -130,6 +138,7 @@ public class RubikCube implements Comparable<RubikCube>
 
     public void moveLcc()//moves left column counterclockwise(downwards)
     /*front left col = bottom left col
+
      *bottom left col =  back right col reversed ---
      *back right col = top left col reversed
      *top left col = front left col  ---
@@ -143,6 +152,7 @@ public class RubikCube implements Comparable<RubikCube>
             cube[0][row][0] = cube[5][row][0];
             cube[5][row][0] = colf2[2-row];
             cube[2][row][2] = colf4[2-row];
+
             cube[4][row][0] = colf0[row];
         }
 
@@ -151,9 +161,11 @@ public class RubikCube implements Comparable<RubikCube>
     }
 
     public void moveR()//moves right column clockwise(upwards)
+
     /*front right column = bottom right column 
      *bottom right column = back left column (reversed) --
      *back left column = top right column (reversed) --
+
      *top right column = front right column 
      *right face twist clockwise
      */
@@ -174,23 +186,29 @@ public class RubikCube implements Comparable<RubikCube>
     }
 
     public void moveRcc()//moves right column counterclockwise(upwards)
+
     /*front right column = bottom right column ---
      *bottom right column = back left column (reversed)---
      *back left column = top right column (reversed)---
      *top right column = front right column ---
+
      *right face twist counterclockwise
      */
     {
         int [] colf0 = getColumn(0, 2);
+
         int [] colf2 = getColumn(2, 0);
+
         int [] colf4 = getColumn(4, 2);
 
         for (int row=0; row<3; row++)
         {
+
             cube[0][row][2] = cube[5][row][2];
             cube[5][row][2] = colf2[2-row];
             cube[2][row][0] = colf4[2-row];
             cube[4][row][2] = colf0[row];
+
         }
 
         twist_face_counterclockwise(3);
@@ -240,11 +258,13 @@ public class RubikCube implements Comparable<RubikCube>
     }
 
     public void moveF()//twists front face clockwise
+
     /*left's right col = bottom's top row 
      *bottom's top row = right's left col (reversed)
      *right's left col = top's down row  
      *top's down row = left's right col (reversed)
      *front face twist clockwise
+
      */
     {
         int[] colf3 = getColumn(3, 0);
@@ -252,6 +272,7 @@ public class RubikCube implements Comparable<RubikCube>
 
         for (int i=0; i<3; i++)
         {
+
             cube[1][i][2] = cube[5][0][i];
             cube[5][0][i] = colf3[2-i];
             cube[3][i][0] = cube[4][2][i];
@@ -278,6 +299,7 @@ public class RubikCube implements Comparable<RubikCube>
             cube[1][i][2] = rowf4[2-i];
             cube[4][2][i] = colf3[i];
             cube[3][i][0] = rowf5[2-i];
+
             cube[5][0][i] = colf1[2-i];
         }
 
@@ -317,6 +339,7 @@ public class RubikCube implements Comparable<RubikCube>
 
     private void twist_face_counterclockwise(int facevalue)
     {
+
         int[] row0 = getRow(facevalue, 0);
         int[] row1 = getRow(facevalue, 1);
         int[] row2 = getRow(facevalue, 2);
@@ -325,6 +348,7 @@ public class RubikCube implements Comparable<RubikCube>
             cube[facevalue][i][0] = row0[2-i];
             cube[facevalue][i][1] = row1[2-i];
             cube[facevalue][i][2] = row2[2-i];
+
         }
     }
 
