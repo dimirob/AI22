@@ -58,6 +58,7 @@ public class RubikCube implements Comparable<RubikCube>
 
 
 
+
     /*MOVES --WE USE 10 MOVES-- */ 
 
     public void moveU()//moves upper side clockwise(to the left)
@@ -283,6 +284,81 @@ public class RubikCube implements Comparable<RubikCube>
 
         twist_face_counterclockwise(0);
     }
+    public void moveB() // moves the back side clockwise(to the left)
+        /*top's top row = right's right col
+         *right's right col = bottom's down row (reversed)
+         *bottom's down row = left's left col
+         *left's left col = top's top row (reversed)
+         *twists back face clockwise
+         */
+    {
+        int[] colf3 =  getColumn(3, 2);
+        int[] rowf5 = getRow(5, 2);
+        int[] colf1 = getColumn(1, 0);
+        int[] rowf4 = getRow(4,0);
+        for(int i=0; i<3; i++)
+        {
+            cube[4][0][i] = colf3[i];
+            cube[3][i][2] = rowf5[2-i];
+            cube[5][2][i] = colf1[i];
+            cube[1][i][0] = rowf4[2-i];
+        }
+        twist_face_clockwise(2); //twists back face clockwise
+    }
+
+
+    public void moveBcc()//moves the back side counterclockwise(to the right)
+        /*top's top row = left's left col (reversed)
+         *left's left col = bottom's down row
+         *bottom's down row = right's right col (reversed)
+         *right's right col = top's top row
+         *twist back face counterclockwise
+         */
+    {
+        int[] colf1 = getColumn(1, 0);
+        int[] rowf5 = getRow(5, 2);
+        int[] colf3 = getColumn(3, 2);
+        int[] rowf4 = getRow(4, 0);
+        for(int i=0;i<3; i++)
+        {
+            cube[4][0][i] = colf1[2-i];
+            cube[1][i][0] = rowf5[i];
+            cube[5][2][i] = colf3[2-i];
+            cube[3][i][2] = rowf4[i];
+        }
+        twist_face_counterclockwise(2); //twists back face counterclockwise
+    }
+    public void move2F()
+    {
+        moveF();
+        moveF();
+    }
+    public void move2B()
+    {
+        moveB();
+        moveB();
+    }
+    public void move2L()
+    {
+        moveL();
+        moveL();
+    }
+    public void move2R()
+    {
+        moveR();
+        moveR();
+    }
+    public void move2U()
+    {
+        moveU();
+        moveU();
+    }
+    public void move2D()
+    {
+        moveD();
+        moveD();
+    }
+
 
 
 
@@ -427,7 +503,7 @@ public class RubikCube implements Comparable<RubikCube>
     public void randomizeCube(int randmoves) //uses a set amount of random moves to scramble the cube 
     {
         Random r  = new Random();
-        int upper = 10;
+        int upper = 18;
         int move;
         for(int i=0; i<randmoves; i++)
         {
@@ -442,6 +518,15 @@ public class RubikCube implements Comparable<RubikCube>
             else if(move==7){moveRcc();}
             else if(move==8){moveF();}
             else if(move==9){moveFcc();}
+            else if (move==10){moveB();}
+            else if (move==11){moveBcc();}
+            else if (move==12){move2B();}
+            else if (move==13){move2F();}
+            else if (move==14){move2D();}
+            else if (move==15){move2R();}
+            else if (move==16){move2U();}
+            else if (move==17){move2L();}
+
         }
 
     }
@@ -494,6 +579,29 @@ public class RubikCube implements Comparable<RubikCube>
             else{sides_solved++;}
             if(sides_solved==sides_needed || sides_solved ==5){return true;}
         } 
+        return false;
+    }
+    public Boolean isCorner(int row,int col){//check if it is a corner piece
+        if(row==0&&col==0) {return true;}
+        else if (row==2&&col==0) {return true;}
+        else if(row==0&&col==2) {return true;}
+        else if(row==2&&col==2){return true;}
+
+        return false;
+    }
+    public boolean isOriented(int face,int row,int col){//check if piece is oriented
+        if(cube[face][row][col]<9&&face==0) return true;
+        else if(cube[face][row][col]<18&&face==1) return true;
+        else if(cube[face][row][col]<27&&face==2) return true;
+        else if (cube[face][row][col]<36&&face==3) return true;
+        else if (cube[face][row][col]<45&&face==4) return true;
+        else if(cube[face][row][col]<54&&face==5) return true;
+        return false;
+    }
+    public Boolean isCp(int face,int row,int col,PositionHolder init_pos){//check if piece is in correct position
+        for(int faces=0;faces<6;faces++){//for every face we check if x y coordinates are correct with the ones currently in the cube
+            if(init_pos.getInitCoordsX(cube[faces][row][col])==row&&init_pos.getInitCoordsY(cube[faces][row][col])==col) return true;
+        }
         return false;
     }
      
@@ -555,8 +663,57 @@ public class RubikCube implements Comparable<RubikCube>
         child.setFather(this);
         children.add(child);
 
+
         child = new RubikCube(this.cube);
         child.moveFcc();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveB();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.moveBcc();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.move2F();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.move2B();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.move2L();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.move2R();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.move2U();
+        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.setFather(this);
+        children.add(child);
+
+        child = new RubikCube(this.cube);
+        child.move2D();
         if(heuristic>0) child.evaluate(heuristic,init_pos);
         child.setFather(this);
         children.add(child);
@@ -571,35 +728,39 @@ public class RubikCube implements Comparable<RubikCube>
 
     private void count3dManhattanDistance(PositionHolder init_pos) //this is the heuristic function for the solution of the cube 
     {
-        int temp = 0;
-        int init_x , init_y , needed_z = 0;
-        int[] center_cubies = {cube[0][1][1], cube[1][1][1], cube[2][1][1],cube[3][1][1],cube[4][1][1],cube[5][1][1]};
-        Arrays.sort(center_cubies);
+        int sum = 0;
         //red = 4 , green = 13 , orange = 22 , blue = 31  , white = 40 , yellow = 49
-
         for(int z = 0; z<6; z++)
         {
             for(int x = 0; x<3; x++)
             {
                 for(int y = 0; y<3; y++)
                 {
-                    init_x = init_pos.getInitCoordsX(cube[z][x][y]);
-                    init_y = init_pos.getInitCoordsY(cube[z][x][y]);
-                    if(cube[z][x][y]<9){needed_z = center_cubies[0];}
-                    else if(cube[z][x][y]<18){needed_z = center_cubies[1];}
-                    else if(cube[z][x][y]<27){needed_z = center_cubies[2];}
-                    else if(cube[z][x][y]<36){needed_z = center_cubies[3];}
-                    else if(cube[z][x][y]<45){needed_z = center_cubies[4];}
-                    else if(cube[z][x][y]<54){needed_z = center_cubies[5];}
-                    temp += Math.abs(z-needed_z) + Math.abs(x - init_x) + Math.abs(y - init_y);
+                    if(!(cube[z][x][y]==4||cube[z][x][y]==13||cube[z][x][y]==22||cube[z][x][y]==31||cube[z][x][y]==40||cube[z][x][y]==49)) sum+=movesNeeded(z,x,y,init_pos);//piece is not in center(center pieces always correct)
                 }
             }
         }
-        if(this.getFather() == null){this.score = temp / 8.0;}
+        if(this.getFather() == null){this.score = sum / 4.0;}
         else
         {
-            this.score = temp / 8.0 + this.father.getScore();
+            this.score = sum / 4.0 + this.father.getScore();
         }
+        
+    }
+
+    private int movesNeeded(int face,int row,int col,PositionHolder init_pos) {
+        if (!((init_pos.getInitCoordsZ(cube[face][row][col])==face)&&(init_pos.getInitCoordsX(cube[face][row][col])==row)&&(init_pos.getInitCoordsY(cube[face][row][col])==col))) {//piece is in wrong position
+            if(isCorner(row,col)){
+                if(isOriented(face,row,col)) return 1;
+                else return 2;
+            }
+            else{
+                if(isOriented(face,row,col)) return 1;
+                else if(isCp(face,row,col,init_pos)) return 3;
+                else return 2;
+            }
+        }
+        return 0;
     }
 
     @Override

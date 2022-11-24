@@ -26,6 +26,7 @@ public class SpaceSearcher
         while(this.frontier.size() > 0)
         {
             RubikCube currentCube = this.frontier.remove(0);
+            currentCube.printCube();
             if(currentCube.checkForFinal(sides_needed)) return currentCube;
             this.frontier.addAll(currentCube.getCubeChildren(heuristic,init_pos));
             Collections.sort(this.frontier);
