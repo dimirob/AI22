@@ -10,6 +10,7 @@ import java.util.Arrays;
 public class RubikCube implements Comparable<RubikCube>
 {
     private int[][][] cube; //values 0-53 (stores initial position)
+    private int state=0;
 
     /*THE THIRD DIMENSION OF THE CUBE INDICATES THE SIDE
      * front 0 , left 1, back 2 , right 3 , top 4 , bottom 5
@@ -19,7 +20,8 @@ public class RubikCube implements Comparable<RubikCube>
      * "FRONT = RED , LEFT = GREEN , BACK = ORANGE , RIGHT = BLUE , TOP = WHITE , BOTTOM = YELLOW"
     */
      
-
+    private void incState(){this.state+=1;}
+    protected int getState(){return this.state;}
     private double score; //the heuristic score for A*
     private RubikCube father = null; // the father state
 
@@ -44,9 +46,16 @@ public class RubikCube implements Comparable<RubikCube>
         randomizeCube(randmoves); //after that it randomises it 
     }
 
-    RubikCube(int[][][] cube) //copy constructor 
+    RubikCube(RubikCube cubie) //copy constructor
     {
-        this.cube = cube;
+        this.father=cubie.getFather();
+        this.cube = cubie.getCube();
+        this.score= cubie.getScore();
+        this.state=cubie.getState();
+    }
+
+    private int[][][] getCube() {
+        return this.cube;
     }
 
     /*GETTERS-SETTERS*/
@@ -61,7 +70,7 @@ public class RubikCube implements Comparable<RubikCube>
 
 
 
-    /*MOVES --WE USE 10 MOVES-- */ 
+    /*MOVES --WE USE 18 MOVES-- */
 
     public void moveU()//moves upper side clockwise(to the left)
     /*front upper row  = right upper row 
@@ -169,7 +178,7 @@ public class RubikCube implements Comparable<RubikCube>
      *right face twist clockwise
      */
     {
-        int [] colf0 = getColumn(0, 2); 
+        int [] colf0 = getColumn(0, 2);
         int [] colf2 = getColumn(2, 0);
         int [] colf4 = getColumn(4, 2);
 
@@ -195,19 +204,15 @@ public class RubikCube implements Comparable<RubikCube>
      */
     {
         int [] colf0 = getColumn(0, 2);
-
         int [] colf2 = getColumn(2, 0);
-
-        int [] colf4 = getColumn(4, 2);
+        int [] colf5 = getColumn(5, 2);
 
         for (int row=0; row<3; row++)
         {
-
-            cube[0][row][2] = cube[5][row][2];
-            cube[5][row][2] = colf2[2-row];
-            cube[2][row][0] = colf4[2-row];
-            cube[4][row][2] = colf0[row];
-
+            cube[0][row][2] = cube[4][row][2];
+            cube[4][row][2] = colf2[2-row];
+            cube[2][row][0] = colf5[2-row];
+            cube[5][row][2] = colf0[row];
         }
 
         twist_face_counterclockwise(3);
@@ -299,7 +304,7 @@ public class RubikCube implements Comparable<RubikCube>
             cube[4][2][i] = colf3[i];
             cube[3][i][0] = rowf5[2-i];
 
-            cube[5][0][i] = colf1[2-i];
+            cube[5][0][i] = colf1[i];
         }
 
         twist_face_counterclockwise(0);
@@ -628,128 +633,148 @@ public void moveB() // moves the back side clockwise(to the left)
         return false;
     }
      
-    public ArrayList<RubikCube> getCubeChildren(int heuristic, PositionHolder init_pos)
+    public ArrayList<RubikCube> getCubeChildren(int heuristic, PositionHolder init_pos,int state)
     {
+
         ArrayList<RubikCube> children = new ArrayList<>();
-        RubikCube child = new RubikCube(this.cube);
+        RubikCube child = new RubikCube(this);
 
         child.moveU();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveUcc();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveD();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveDcc();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveL();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveLcc();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveR();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveRcc();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveF();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveFcc();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveB();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.moveBcc();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.move2F();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.move2B();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.move2L();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.move2R();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.move2U();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
-        child = new RubikCube(this.cube);
+        child = new RubikCube(this);
         child.move2D();
-        if(heuristic>0) child.evaluate(heuristic,init_pos);
+        child.incState();
+        if(heuristic>0) child.evaluate(heuristic,init_pos,state);
         child.setFather(this);
         children.add(child);
 
         return children;
     }
 
-    private void evaluate(int heuristic, PositionHolder init_pos)
+    private void evaluate(int heuristic, PositionHolder init_pos,int state)
     {
-        if(heuristic==1){this.count3dManhattanDistance(init_pos);}
+        if(heuristic==1){this.count3dManhattanDistance(init_pos,state);}
     }
 
-    private void count3dManhattanDistance(PositionHolder init_pos) //this is the heuristic function for the solution of the cube 
+    private void count3dManhattanDistance(PositionHolder init_pos,int state) //this is the heuristic function for the solution of the cube
     {
         int sum = 0;
         //red = 4 , green = 13 , orange = 22 , blue = 31  , white = 40 , yellow = 49
@@ -759,19 +784,18 @@ public void moveB() // moves the back side clockwise(to the left)
             {
                 for(int y = 0; y<3; y++)
                 {
-                    if(!(cube[z][x][y]==4||cube[z][x][y]==13||cube[z][x][y]==22||cube[z][x][y]==31||cube[z][x][y]==40||cube[z][x][y]==49)) sum+=movesNeeded(z,x,y,init_pos);//piece is not in center(center pieces always correct)
+                    if(!(cube[z][x][y]==4||cube[z][x][y]==13||cube[z][x][y]==22||cube[z][x][y]==31||cube[z][x][y]==40||cube[z][x][y]==49)) {//piece is not in center(center pieces always correct)
+
+                        sum+=movesNeeded(z,x,y,init_pos);}
                 }
             }
         }
-        if(this.getFather() == null){this.score = sum / 4.0;}
-        else
-        {
-            this.score = sum / 4.0 + this.father.getScore();
-        }
-        
+        this.setScore(sum / 16.0 + 1);
+
+        System.out.println(this.score);
     }
 
-    private int movesNeeded(int face,int row,int col,PositionHolder init_pos) {
+    private double movesNeeded(int face,int row,int col,PositionHolder init_pos) {
         if (!((init_pos.getInitCoordsZ(cube[face][row][col])==face)&&(init_pos.getInitCoordsX(cube[face][row][col])==row)&&(init_pos.getInitCoordsY(cube[face][row][col])==col))) {//piece is in wrong position
             if(isCorner(row,col)){
                 if(isOriented(face,row,col)) return 1;
